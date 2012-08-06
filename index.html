@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Black Jack Final</title>
+<script type="text/javascript">
+// Card Constructor
+function Card(s, n){
+	var suit=s;
+	var num=n;
+	this.getNumber=function(){
+		return num;
+	};
+	//Get the rank of the card
+	this.getRank=function(){
+		if(num>=2 && num<=10)
+			return num;
+		if(num===11)
+			return "J";
+		if(num===12)
+			return "Q";
+		if(num===13)
+			return "K";
+		if(num===1)
+			return "A";	
+	};
+	this.getSuit=function(){
+		var st="";
+		switch(suit){
+			case 1:
+				st="Hearts";
+				break;
+			case 2:
+				st="Diamonds";
+				break;
+			case 3:
+				st="Spades";
+				break;
+			case 4:
+				st="Clubs";
+				break;
+			default:
+				st="None";
+		}
+		return st;
+	};
+	this.getValue=function(){
+		if(num>=11&&num<=13){
+			return 10;
+		}else if(num==1){
+			return 11;
+		}else{
+			return num;
+		}
+	};
+}
+var deal= function(){
+	var suit=Math.floor(Math.random()*4)+1;
+	var num=Math.floor(Math.random()*13)+1;
+	var newcard= new Card(suit,num);
+	return newcard;
+};
+
+function Hand(){
+	var cards=new Array();
+	cards[0]=deal();
+	cards[1]=deal();
+	this.getHand=function(){
+		return cards;
+	};
+	this.score=function(){
+		var sum=0;
+		var aceCount=0;
+		for(var i=0;i<cards.length;i++){
+			if(cards[i].getValue==11)
+				aceCount++;
+			sum += cards[i].getValue();
+		}
+		if(sum>21 && aceCount>0){
+			var j=0;
+			while(j<aceCount){
+				sum -= 10;
+				if(sum<=21)
+					return sum;
+				j++;
+			}
+		}
+		return sum;
+	};
+	this.printHand=function(){
+		var myhand="";
+		for(var i=0;i<cards.length;i++){
+			if(i !== cards.length-1)
+				myhand += cards[i].getRank()+" of "+cards[i].getSuit()+", ";
+			else
+				myhand += cards[i].getRank()+" of "+cards[i].getSuit()+".";
+		}
+		return myhand;
+	};
+	this.hitMe=function(){
+		var newcard=deal();
+		cards.push(newcard);
+	};
+}
+var playAsDealer=function(){
+	var newHand=new Hand();
+	if(newHand.score()<17){
+		newHand.hitMe();
+	}
+	return newHand;
+};
+
+//play as a user
+var playAsUser=function(){
+	var newHand=new Hand();
+	while(confirm("You have: "+newHand.printHand()+"\nDo you want to hit?")){
+		newHand.hitMe();
+	}
+	return newHand;
+};
+
+var declareWinner=function(userHand,dealerHand){
+	var usrScore=userHand.score();
+	var dlrScore=dealerHand.score();
+	if(usrScore>21){
+		if(dlrScore>21)
+			return "You tied!";
+		else
+			return "You lose!";
+	}else if(dlrScore>21){
+		return "You win!";
+	}else if(usrScore>dlrScore)
+		return "You win!";
+	else if(usrScore==dlrScore)
+		return "You tied!";
+	else
+		return "You lose!";
+};
+
+var playGame=function(){
+	var userHand=playAsUser();
+	var dealerHand=playAsDealer();
+	var result=declareWinner(userHand,dealerHand);
+	
+	document.getElementById("dlrHand").innerHTML= "Dealer's hand:<br>"+dealerHand.printHand();
+	document.getElementById("dlrScore").innerHTML= "Score: "+dealerHand.score();
+	document.getElementById("myHand").innerHTML="User's hand:<br>"+userHand.printHand();
+	document.getElementById("myScore").innerHTML="Score: "+userHand.score();
+	document.getElementById("result").innerHTML=result;
+	
+	console.log("dealer's hand is: "+dealerHand.printHand());
+	console.log("user's hand is: "+userHand.printHand());
+	console.log(result+"\n");
+};
+//playGame();
+</script>
+</head>
+
+<body>
+<div>
+  <h1>Black Jack Game-Final</h1>
+</div>
+<div>
+	<button onclick="playGame()">Play Game</button>
+</div>
+<div class="wrapper">
+	<h2 id="dlrHand"></h2>
+	<div id="dlrScore"></div>
+	<h2 id="myHand"></h2>
+	<div id="myScore"></div>
+	<h1 id="result" style="color:#F00"></h1>
+</div>
+</body>
+</html>
